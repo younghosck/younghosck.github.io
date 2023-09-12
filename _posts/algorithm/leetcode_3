@@ -1,0 +1,123 @@
+문제부터 잘 읽자
+
+Find the length the longest substring without repeating characters.
+
+반복되지 않는 character을 포함한 가장 긴 substring
+
+asciitable[256][3]을 만들어 관리한다
+
+두번째 열은 임시 길이를 저장하고, 세번째 열은 중복되는 chracter가 나올 때 maximum length를 저장한다.
+
+asciitable [s[i]][0]]의 값으로 중복(1)인지 아닌지를 판단하고,
+
+if(asciitable[s[i]][0]) 로 
+
+또 연속해서 같은 character가 등장하는지 판단해야 한다.
+
+연속해서 등장한다면 두번째열을 세번째열에 담고모두 초기화 해주어야한다.
+
+위 알고리즘의 문제는 s=” (A)  d  (B) d “라 했을 때, (A)와 (B)를 구분할 수 없다는 한계가 있다. 
+
+1시간 40분이 지났으므로 이 문제는 답을 보도록 한다.
+
+```cpp
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        char asciitable[256][3]={0};
+        //second column => temperature length,
+        //third column => maximum length
+        int s_size=s.length();
+        int temp;
+        int ans=0;
+        for (int i=0;i<s_size;i++){
+            if(!asciitable[s[i]][0]){
+                asciitable[s[i]][0]=1;
+                temp=s[i];
+                for(int j=0;j<256;j++){
+                    if(asciitable[j][0]){
+                        asciitable[j][1]++;
+                    }
+                }
+                
+
+            }
+            else if(temp==s[i]){
+                for(int j=0;j<256;j++){
+                    if(asciitable[j][1]>asciitable[j][2]){
+                        asciitable[j][2]=asciitable[j][1];
+                    }
+                    
+                }
+                for(int j=0;j<256;j++){
+                    asciitable[j][0]=0;
+                    asciitable[j][1]=0;
+                }
+                asciitable[s[i]][0]=1;
+                asciitable[s[i]][1]=1;
+                ans=1;
+            }
+            else{
+                for(int j=0;j<256;j++){
+                    if(asciitable[j][0]&&(j!=s[i])){
+                        asciitable[j][1]++;
+                    }
+                }
+                
+                if(asciitable[s[i]][1]>asciitable[s[i]][2]){
+                    asciitable[s[i]][2]=asciitable[s[i]][1];
+                }
+                asciitable[s[i]][1]=0;
+
+                
+            }
+        }
+        for(int j=0;j<256;j++){
+            if(asciitable[j][1]>ans){
+                ans=asciitable[j][1];
+            }
+            if(asciitable[j][2]>ans){
+                ans=asciitable[j][2];
+            }
+        }
+        return ans;
+    }
+};
+```
+
+Time: 1:41:00
+
+Solution 보고 함
+
+```cpp
+//By sidthakur1
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        unordered_set<char>set;
+        int i=0,j=0,s_size=s.size(),ans=0;
+
+        while(i<s_size&&j<s_size){
+            if(set.find(s[j])==set.end())
+            {
+                set.insert(s[j++]);
+                ans=max(ans,j-i);
+            }
+            else
+            {
+                set.erase(s[i++]);
+            }
+        }
+
+        return ans;
+    }
+};
+```
+
+TC : O(n)
+
+SC: O(1)
+
+문제를 접근할 때 문장의 처음부터 뒤까지 알고 있다는 가정을 했기에 잘 안풀렸던것임.
+
+ O(n)으로 문장에 접근한다는 가정하에, 컴퓨터의 정보량을 알고 i,j index를 두개 두어서, 중복되는 char 나올 경우마다 무조건 맨 앞의 것이 중복되는 char임을 알고, 앞 뒤것 빼주면서 max를 최신화시켜주는 것이 최선이다.
