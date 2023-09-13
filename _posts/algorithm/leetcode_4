@@ -1,0 +1,58 @@
+2,3,4, … , 49,51,52,…,100} 어떻게 찾을래
+
+m 중간 찾고 n 중간 찾는 걸 이어나가본다 
+
+25,51
+
+1시간 고민함  안 풀림 답을 본다
+
+2 vectors 사이에 중간값이라는 것이 각 vector를 두개의 partition 으로 나눌 때 
+
+num1 arr: x1 arr x2 arr
+
+num2 arr: y1 arr y2 arr
+
+x1+ y1의 크기 = x2 y2의 크기이고
+
+x1의 최댓값이 y2의 최솟값보다 작고 y1의 최댓값이 x2의 최솟값보다 작다면
+
+x1과 y1의 최댓값이 미디언이다. 
+
+Solution
+
+```cpp
+//stellari
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int>& nums1, vector<int>& nums2) {
+        int x=nums1.size();
+        int y=nums2.size();
+        if(x>y) return findMedianSortedArrays(nums2,nums1);
+        int low = 0;
+        int high = x;
+        while ( low <= high) {
+            int partitionX=(low+high)/2;
+            int partitionY =(x+y+1)/2-partitionX;
+            
+            double LX=partitionX==0? INT_MIN: nums1[partitionX-1];
+            double RX=partitionX==x? INT_MAX: nums1[partitionX];
+
+            double LY=partitionY==0? INT_MIN: nums2[partitionY-1];
+            double RY=partitionY==y? INT_MAX: nums2[partitionY];
+
+            if(LX<=RY&&LY<=RX)
+            {
+                return (x + y)%2!=0 ? max(LX,LY):(max(LX,LY)+min(RX,RY))/2;
+            }
+            else if(LX>RY) high=partitionX-1;
+            else low =partitionX+1;
+
+        }
+        return -1;
+    }
+};
+```
+
+코드 그대로 받아적고, 이해하는데 1시간이 더걸림
+
+어렵다 혼자 할 수 있을때까지 해봐야함
